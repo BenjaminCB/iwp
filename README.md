@@ -1,3 +1,3 @@
-# iwp
+# IWP
 
-repo for everything related to iwp course.
+repo for everything related to IWP course.
