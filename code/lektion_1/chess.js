@@ -1,6 +1,14 @@
+const readline = require("readline");
 
-chessboard(7);
-chessboard(10);
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.question("Enter the size of cheesboard: ", function(size) {
+    chessboard(size);
+    rl.close();
+});
 
 function chessboard(n) {
     let str = "";
