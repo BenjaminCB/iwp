@@ -375,6 +375,10 @@ function printHTMLBody(body) {
     let str=`
         <body>
             ${body}
+            <p>
+                Need help find it <a href="help.html">here</a>.<br>
+                More help on <a href="https://da.wikipedia.org/wiki/Yatzy">wikipedia</a>
+            </p>
         </body>
     </html>`;
 
@@ -415,7 +419,8 @@ function printScoresHTML(play) {
             res += "<span>";
 
             for (let d = 0; d < play[round].diceRoll.length; d++) {
-                res += `<img src="resources/${play[round].diceRoll[d]}-dice.png" width="20" height="20"}">`;
+                // res += `<img src="resources/${play[round].diceRoll[d]}-dice.png" width="20" height="20"}">`;
+                res += d + " ";
             }
 
             res += "</span>";
@@ -436,6 +441,6 @@ function printScoresHTML(play) {
 //main function for generating the HTML code for the play
 function printHTMLPage(play) {
     let page=printHTMLHdr("IWP Yatzy Game");
-    page+=printHTMLBody(printScoresHTML(play));
+    page += printHTMLBody(printScoresHTML(play));
     return page;
 }
