@@ -9,6 +9,12 @@
 //Note that we use EC6 modules! 
 //You may need to add this to the package.json file when using EC6 modules: "type": "module",
 import fs from 'fs'; 
+import http from 'http';
+import parse from 'querystring';
+import express from 'express';
+
+const app = express();
+const port = 3000;
 
 const M = 10; //Number of dice >=5 , <=20
 const MIN_DICE = 1; const MAX_DICE = 6; //min and max value of a normal dice.
@@ -59,10 +65,10 @@ function random(min, max) {
 //returns an array that represents the outcome of rolling M dice
 ///e.g diceRoll [1,6,5,5,2] 
 let roll = function (M) {
-    let diceRoll=[];
+    let diceRoll = [];
 
     for (let i = 0; i < M; i++) {
-        diceRoll[i]= random(MIN_DICE,MAX_DICE); 
+        diceRoll[i] = random(MIN_DICE,MAX_DICE); 
     }
 
     return diceRoll;
@@ -210,8 +216,8 @@ function calcChance(diceCount) {
     let rest = 5; //Use only 5 (largest) dice 
     let sum = 0; 
 
-    for(let i = d2i(MAX_DICE); i >= d2i(MIN_DICE) && rest > 0; i--) {
-        for(let j=0;j<diceCount[i] && rest>0; j++) {
+    for (let i = d2i(MAX_DICE); i >= d2i(MIN_DICE) && rest > 0; i--) {
+        for (let j=0; j<diceCount[i] && rest>0; j++) {
             sum += i2d(i);
             rest--;
         }
@@ -232,7 +238,7 @@ function calcYatzy(diceCount) {
 function calcTotal(play) {
     let total = 0;
 
-    for(let round = rounds.sum; round < rounds.total; round++) {
+    for (let round = rounds.sum; round < rounds.total; round++) {
         total += play[round].score;
     }
 
@@ -268,7 +274,7 @@ function printScores(play) {
 function playRound(play, roundNo, roll) {
     let c = countDice(roll);
     let score = 0;
-    switch(roundNo) {
+    switch (roundNo) {
         case rounds.ones: 
             score = 1 * c[d2i(1)];
             break;
@@ -316,7 +322,7 @@ function playRound(play, roundNo, roll) {
             break; 
         default: 
             console.log("no such game:" + roundNo);
-      }
+    }
 
     noteScore(play, roundNo, score, roll); //record the score in scoreboard
 
@@ -332,7 +338,7 @@ function playRound(play, roundNo, roll) {
 }
 
 //this function simply plays the game sequentially from top to bottum on the scoreboard
-function playGame() { 
+function playGame(mode) { 
     let play1 = newScoreBoard();
 
     for (let roundNo = 0; roundNo < noRounds; roundNo++) {
@@ -343,9 +349,10 @@ function playGame() {
         }
     } 
 
-    let scoreTable = printHTMLPage(play1);
+    // return printHTMLPage(play1, mode);
+    let scoreTable = printHTMLPage(play1, mode);
     fs.writeFileSync("scores.html", scoreTable);
-    printScores(play1);
+    // printScores(play1);
     // console.log(JSON.stringify(play1));
     //console.log(play1);
 }
@@ -379,6 +386,14 @@ function printHTMLBody(body) {
                 Need help find it <a href="help.html">here</a>.<br>
                 More help on <a href="https://da.wikipedia.org/wiki/Yatzy">wikipedia</a>
             </p>
+            <form action="http://localhost:3000/" method="post">
+                <select name="val">
+                    <option value="number">Numbers</option>
+                    <option value="image">Images</option>
+                </select>
+                <button>Save</button>
+            </form>
+            </form>
         </body>
     </html>`;
 
@@ -396,7 +411,7 @@ function printScoreTableHdrHTML() {
 }
 
 //generates the HTML code for the play scores table, assumed to be complete.
-function printScoresHTML(play) {
+function printScoresHTML(play, mode) {
     //Print table header and caption
     let res = `<table id="scoretable"> \n`;
     res += printScoreTableHdrHTML(play);
@@ -419,8 +434,11 @@ function printScoresHTML(play) {
             res += "<span>";
 
             for (let d = 0; d < play[round].diceRoll.length; d++) {
-                // res += `<img src="resources/${play[round].diceRoll[d]}-dice.png" width="20" height="20"}">`;
-                res += d + " ";
+                if (mode === "image") {
+                    res += `<img src="./resources/${play[round].diceRoll[d]}-dice.png" width="20" height="20" title="${play[round].diceRoll[d]}-dice">`;
+                } else {
+                    res += play[round].diceRoll[d]+ " ";
+                }
             }
 
             res += "</span>";
@@ -439,8 +457,52 @@ function printScoresHTML(play) {
 }
 
 //main function for generating the HTML code for the play
-function printHTMLPage(play) {
+function printHTMLPage(play, mode) {
     let page=printHTMLHdr("IWP Yatzy Game");
-    page += printHTMLBody(printScoresHTML(play));
+    page += printHTMLBody(printScoresHTML(play, mode));
     return page;
 }
+
+// const server = http.createServer((req, res) => {
+//     function send() {
+//          fs.readFile('./scores.html', null, function (error, data) {
+//             if (error) {
+//                 res.writeHead(404);
+//                 res.write('Whoops! File not found!');
+//             } else {
+//                 res.write(data);
+//             }
+//             res.end();
+//         });
+//     }
+//     if (req.method === "POST") {
+//         let body = '';
+//         req.on('data', chunk => {
+//             body += chunk.toString(); // convert Buffer to string
+//         });
+//         req.on('end', () => {
+//             playGame(parse.parse(body).val)
+//             send();
+//         });
+//     } else {
+//         playGame("image")
+//         send();
+//     }
+// });
+//
+// server.listen(3000);
+
+app.post('/', (req, res) => {
+    if (req.method === "POST") {
+        playGame(parse.parse(body).val);
+        // res.sendFile("/home/bcb/git/iwp/3_lektion/yatzy/scores.html");
+    } else {
+        playGame("image");
+        // res.sendFile("/home/bcb/git/iwp/3_lektion/yatzy/scores.html");
+    }
+    res.end();
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
