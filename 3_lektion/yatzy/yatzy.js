@@ -9,9 +9,10 @@
 //Note that we use EC6 modules! 
 //You may need to add this to the package.json file when using EC6 modules: "type": "module",
 import fs from 'fs'; 
-import http from 'http';
-import parse from 'querystring';
 import express from 'express';
+import bodyParser from 'body-parser';
+import path from 'path';
+const __dirname = path.resolve();
 
 const app = express();
 const port = 3000;
@@ -372,7 +373,7 @@ function printHTMLHdr(title) {
     <head>
         <title>${title}</title>
         <meta charset="utf-8">
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="/static/style.css">
     </head>`;
     return str;
 }
@@ -386,12 +387,12 @@ function printHTMLBody(body) {
                 Need help find it <a href="help.html">here</a>.<br>
                 More help on <a href="https://da.wikipedia.org/wiki/Yatzy">wikipedia</a>
             </p>
-            <form action="http://localhost:3000/" method="post">
+            <form action="/" method="post">
                 <select name="val">
                     <option value="number">Numbers</option>
                     <option value="image">Images</option>
                 </select>
-                <button>Save</button>
+                <button type="submit" name="submit">Save</button>
             </form>
             </form>
         </body>
@@ -435,7 +436,7 @@ function printScoresHTML(play, mode) {
 
             for (let d = 0; d < play[round].diceRoll.length; d++) {
                 if (mode === "image") {
-                    res += `<img src="./resources/${play[round].diceRoll[d]}-dice.png" width="20" height="20" title="${play[round].diceRoll[d]}-dice">`;
+                    res += `<img src="/static/${play[round].diceRoll[d]}-dice.png" width="20" height="20" title="${play[round].diceRoll[d]}-dice">`;
                 } else {
                     res += play[round].diceRoll[d]+ " ";
                 }
@@ -463,46 +464,25 @@ function printHTMLPage(play, mode) {
     return page;
 }
 
-// const server = http.createServer((req, res) => {
-//     function send() {
-//          fs.readFile('./scores.html', null, function (error, data) {
-//             if (error) {
-//                 res.writeHead(404);
-//                 res.write('Whoops! File not found!');
-//             } else {
-//                 res.write(data);
-//             }
-//             res.end();
-//         });
-//     }
-//     if (req.method === "POST") {
-//         let body = '';
-//         req.on('data', chunk => {
-//             body += chunk.toString(); // convert Buffer to string
-//         });
-//         req.on('end', () => {
-//             playGame(parse.parse(body).val)
-//             send();
-//         });
-//     } else {
-//         playGame("image")
-//         send();
-//     }
-// });
-//
-// server.listen(3000);
+app.use(bodyParser.urlencoded({
+    extended:true
+}));
 
-app.post('/', (req, res) => {
-    if (req.method === "POST") {
-        playGame(parse.parse(body).val);
-        // res.sendFile("/home/bcb/git/iwp/3_lektion/yatzy/scores.html");
-    } else {
-        playGame("image");
-        // res.sendFile("/home/bcb/git/iwp/3_lektion/yatzy/scores.html");
-    }
-    res.end();
-})
+app.use("/static", express.static('resources'));
+app.use("/static", express.static('css'));
+
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/scores.html");
+    // res.sendFile(__dirname + "/css/style.css");
+});
+
+app.post("/", (req, res) => {
+    playGame(req.body.val);
+    res.sendFile(__dirname + "/scores.html");
+});
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
+
