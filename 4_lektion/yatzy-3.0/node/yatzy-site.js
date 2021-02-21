@@ -1,6 +1,7 @@
-import {NUM_ROUNDS,playRound,roll,isSpecialRound, newScoreBoard} from "./yatzy-game.js"
-export {yatzyHomePage,newYatzyGamePage,newYatzyRoundPage,validateYatzyConfigData,validateYatzyRoundData,
-  validateYatzyHighScoreData,yatzyHighScorePage,VALIDATION_ERROR}
+import {NUM_ROUNDS, playRound, roll, isSpecialRound, newScoreBoard} from "./yatzy-game.js"
+export {yatzyHomePage, newYatzyGamePage, newYatzyRoundPage, validateYatzyConfigData,
+        validateYatzyRoundData, validateYatzyHighScoreData, 
+        yatzyHighScorePage, VALIDATION_ERROR}
 
 /* *****************************************************************
   DISCLAIMER: This code is developed to support education and demo 
@@ -249,6 +250,7 @@ function YatzyGame(gameID, name, diceCount) {
             </div>
             </fieldset>
         </form>`;
+        gameConfigFormHTML += printAnchorSection(["Help"], ["html/help.html"]);
         let page = printHTMLHdr("IWP Yatzy Game", ["css/style.css"]);
         page += printHTMLBody(gameConfigFormHTML);
         return page;
@@ -269,6 +271,7 @@ function YatzyGame(gameID, name, diceCount) {
             </output>
             </fieldset>
         </form>\n`;
+        newRoundFormHTML += printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
         let page = printHTMLHdr("IWP Yatzy Game", ["css/style.css"]);
         page += printHTMLBody(newRoundFormHTML);
         return page;
@@ -309,7 +312,7 @@ function printHTMLHdr(title, csss = [], scripts = []) {
 
     let str = `
     <!DOCTYPE html>
-    <html lang="da">
+    <html lang="en">
     <head>
         <title>${title}</title>
         <meta charset="utf-8">
@@ -336,6 +339,18 @@ function printHTMLBody(body, scripts = []) {
         ${scriptString}
     </body>
     </html>`;
+
+    return str;
+}
+
+function printAnchorSection(descriptions, refs) {
+    let str = `<h2>Links</h2>\n\t<ul>\n\t`;
+
+    for (let i = 0; i < descriptions.length; i++) {
+        str += `\t<li><a href="${refs[i]}">${descriptions[i]}</a></li>\n\t`; 
+    };
+
+    str += `</ul>`;
 
     return str;
 }
