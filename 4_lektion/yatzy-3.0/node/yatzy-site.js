@@ -1,6 +1,6 @@
 import {NUM_ROUNDS,playRound,roll,isSpecialRound, newScoreBoard} from "./yatzy-game.js"
 export {yatzyHomePage,newYatzyGamePage,newYatzyRoundPage,validateYatzyConfigData,validateYatzyRoundData,
-  validateYatzyHighScoreData,yatzyHighScorePage,ValidationError}
+  validateYatzyHighScoreData,yatzyHighScorePage,VALIDATION_ERROR}
 
 /* *****************************************************************
   DISCLAIMER: This code is developed to support education and demo 
@@ -15,7 +15,7 @@ export {yatzyHomePage,newYatzyGamePage,newYatzyRoundPage,validateYatzyConfigData
   Then, the validated data is forwarded to a function that computes the actual client response (HTML page). 
   * ******************************************************************************** */
 
-const ValidationError="Validation Error";
+const VALIDATION_ERROR = "Validation Error";
 
 
 //constants for validating input from the network client
@@ -48,7 +48,7 @@ function validateYatzyConfigData(gameFormData) {
     }
 
     //anything else: No Go! 
-    throw(new Error(ValidationError));
+    throw(new Error(VALIDATION_ERROR));
 }
 
 //Called by the server when it has received the Yatzy Round form
@@ -65,7 +65,7 @@ function validateYatzyRoundData(roundFormData) {
         }
     }
     //any other case: no go! 
-    throw(new Error(ValidationError));
+    throw(new Error(VALIDATION_ERROR));
 }
 
 //Called by the server when it has received a GET on the "/" resource
