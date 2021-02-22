@@ -109,13 +109,27 @@ function validateYatzyHighScoreData(formsData) {
 function yatzyHighScorePage(validatedData) {
     console.log("validatedData start\n" + validatedData + "\nvalidated end");
     let hdr = printHTMLHdr("Yatzy - Highscores", ["css/style.css"]);
-    let body = "<h1>Highscores</h1>\n";
-
     let highscores = yatzyController.gamesSummary();
+    let table = `
+    <table id="scoretable">
+        <caption> Yatzy - Highscores </caption>
+        <thead>
+            <tr>
+            <th> Name </th>
+            <th> Score </th>
+            </tr>
+        </thead>`;
 
-    console.log(highscores);
+    for (let game of highscores) {
+        let c1 = printTableCellHTML("class=\"left-text\"", game.name);
+        let c2 = printTableCellHTML("class=\"right-text\"", game.score);
+        table += printTableRowHTML("", c1 + c2);
+    };
 
-    body += printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
+    table += "</table>\n";
+
+    let body = table + printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
+    body = printHTMLBody(body);
     let page = hdr + body;
     return page;
 }
@@ -159,9 +173,7 @@ let yatzyController = {
             summary[i].score = score === 0 ? 0 : 5 * score / this.games[i].diceCount;
         };
 
-        console.log(summary);
         summary.sort((a, b) => b.score - a.score);
-        console.log(summary);
 
         return summary;
     }
