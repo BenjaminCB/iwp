@@ -107,7 +107,17 @@ function validateYatzyHighScoreData(formsData) {
 //It is to return a complete HTML page with the high-score contents.  
 //TODO
 function yatzyHighScorePage(validatedData) {
-    return "";
+    console.log("validatedData start\n" + validatedData + "\nvalidated end");
+    let hdr = printHTMLHdr("Yatzy - Highscores", ["css/style.css"]);
+    let body = "<h1>Highscores</h1>\n";
+
+    let highscores = yatzyController.gamesSummary();
+
+    console.log(highscores);
+
+    body += printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
+    let page = hdr + body;
+    return page;
 }
 
 /* **************************************************************************** *
@@ -137,6 +147,23 @@ let yatzyController = {
         let game = new YatzyGame(gameID, gameData.name, gameData.diceCount);
         this.games[gameID] = game;
         return game;
+    },
+
+    gamesSummary() {
+        let summary = [];
+
+        for (let i = 0; i < this.games.length; i++) {
+            summary[i] = {name: "", score: 0};
+            summary[i].name = this.games[i].name;
+            let score = this.games[i].scoreTable[17].score;
+            summary[i].score = score === 0 ? 0 : 5 * score / this.games[i].diceCount;
+        };
+
+        console.log(summary);
+        summary.sort((a, b) => b.score - a.score);
+        console.log(summary);
+
+        return summary;
     }
 }
 
@@ -250,7 +277,7 @@ function YatzyGame(gameID, name, diceCount) {
             </div>
             </fieldset>
         </form>`;
-        gameConfigFormHTML += printAnchorSection(["Help"], ["html/help.html"]);
+        gameConfigFormHTML += printAnchorSection(["Highscores", "Help"], ["/highscores", "html/help.html"]);
         let page = printHTMLHdr("IWP Yatzy Game", ["css/style.css"]);
         page += printHTMLBody(gameConfigFormHTML);
         return page;
@@ -271,7 +298,7 @@ function YatzyGame(gameID, name, diceCount) {
             </output>
             </fieldset>
         </form>\n`;
-        newRoundFormHTML += printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
+        newRoundFormHTML += printAnchorSection(["Home","Highscores", "Help"], ["/","/highscores", "html/help.html"]);
         let page = printHTMLHdr("IWP Yatzy Game", ["css/style.css"]);
         page += printHTMLBody(newRoundFormHTML);
         return page;
