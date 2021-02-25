@@ -33,17 +33,19 @@ function validateYatzyConfigData(gameFormData) {
     let playerName;
     let playerNameLen;
     let diceCount;
+    let imgOrNum;
 
     //ensure that data contains the right fields
     if (gameFormData.has("name") && gameFormData.has("diceCount")) {
         playerName = gameFormData.get("name");
         playerNameLen = playerName.length;
         diceCount = Number(gameFormData.get("diceCount"));
+        imgOrNum = gameFormData.get("imgOrNum");
         //and right values
         if ((playerNameLen >= MIN_NAME_LEN) && (playerNameLen <= MAX_NAME_LEN) &&
            (diceCount >= MIN_DICE_COUNT) && (diceCount <= MAX_DICE_COUNT) ) {
             //strip other fields from the form
-            let gameData = {name: playerName, diceCount: diceCount}; 
+            let gameData = {name: playerName, diceCount: diceCount, mode: imgOrNum}; 
             return gameData;
         }
     }
@@ -100,16 +102,22 @@ function newYatzyRoundPage(roundData) {
 //TODO
 function validateYatzyHighScoreData(formsData) {
     //Validate
-    return formsData;
+    let data = {filter: formsData.get("filter")};
+    return data;
 }
 
 //called by the server when the user has requested the highscore (after validation)
 //It is to return a complete HTML page with the high-score contents.  
 //TODO
 function yatzyHighScorePage(validatedData) {
-    console.log("validatedData start\n" + validatedData + "\nvalidated end");
     let hdr = printHTMLHdr("Yatzy - Highscores", ["css/style.css"]);
     let highscores = yatzyController.gamesSummary();
+    let filter = [...highscores];
+ 
+    if (validatedData.filter != "all") {
+        filter = highscores.filter(game => game.name === validatedData.filter);
+    }
+
     let table = `
     <table id="scoretable">
         <caption> Yatzy - Highscores </caption>
@@ -120,7 +128,7 @@ function yatzyHighScorePage(validatedData) {
             </tr>
         </thead>`;
 
-    for (let game of highscores) {
+    for (let game of filter) {
         let c1 = printTableCellHTML("class=\"left-text\"", game.name);
         let c2 = printTableCellHTML("class=\"right-text\"", game.score);
         table += printTableRowHTML("", c1 + c2);
@@ -128,7 +136,30 @@ function yatzyHighScorePage(validatedData) {
 
     table += "</table>\n";
 
-    let body = table + printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
+    let options = function() {
+        let o = "";
+        let seen = [];
+        for (let game of highscores) {
+            if (seen.includes(game.name)) {
+                continue;
+            } else {
+                o += `<option name="${game.name}">${game.name}</option>\n`;
+                seen.push(game.name);
+            }
+        }
+        return o;
+    };
+
+    let dropdown = `
+    <form action="/highscores" method="post">
+        <select name="filter">
+            <option value="all">All</option>
+            ${options()}
+        </select>
+        <button type"submit">Filter</button>
+    </form>`;
+
+    let body = dropdown + table + printAnchorSection(["Home", "Help"], ["/", "html/help.html"]);
     body = printHTMLBody(body);
     let page = hdr + body;
     return page;
@@ -158,7 +189,7 @@ let yatzyController = {
     //initiates a new game; allocate empty game and assign gameID; store in DB
     newYatzyGame: function (gameData) {
         let gameID = this.games.length;
-        let game = new YatzyGame(gameID, gameData.name, gameData.diceCount);
+        let game = new YatzyGame(gameID, gameData.name, gameData.diceCount, gameData.mode);
         this.games[gameID] = game;
         return game;
     },
@@ -186,10 +217,11 @@ let yatzyController = {
   The length part is what produces the HTML of the scoreboard and forms.
   * ******************************************************************************** */
 
-function YatzyGame(gameID, name, diceCount) {
+function YatzyGame(gameID, name, diceCount, mode) {
     this.gameTitle = "IWP Multi Yatzy";
     this.gameID = gameID;
     this.name = name;
+    this.mode = mode;
     this.diceCount = diceCount;
     this.roundNo = 0;  //the next round to play
     this.scoreTable = newScoreBoard();
@@ -250,7 +282,13 @@ function YatzyGame(gameID, name, diceCount) {
             if (!isSpecialRound(round)) {
                 c2 += "<span>";
                 for (let d = 0; d < this.scoreTable[round].diceRoll.length; d++){
-                    c2 += `<img src="img/${this.scoreTable[round].diceRoll[d]}-dice.png" width="20" height="20" alt="dice ${this.scoreTable[round].diceRoll[d]} ">`;
+                    console.log("here");
+                    console.log(mode);
+                    if (this.mode === "num") {
+                        c2 += String(this.scoreTable[round].diceRoll[d]) + " ";                      
+                    } else {
+                        c2 += `<img src="img/${this.scoreTable[round].diceRoll[d]}-dice.png" width="20" height="20" alt="dice ${this.scoreTable[round].diceRoll[d]} ">`;
+                    }
                 }
                 c2 += "</span>";
             }
@@ -285,6 +323,11 @@ function YatzyGame(gameID, name, diceCount) {
                 <input type="text" id="name_id" name="name" placeholder="Navn" autofocus required minlength="1" maxlength="30"> 
                 <label for="diceCount_id"> Number of Dice:</label> 
                 <input type="number" id="diceCount_id" name="diceCount" placeholder="5" min="5" max="20" required>
+                <label for="mode"> Image or number:</label>
+                <select id="mode" name="imgOrNum">
+                    <option value="num">Num</option>
+                    <option value="image">Images</option>
+                </select>
                 <input type="submit"  value="New Game">
             </div>
             </fieldset>

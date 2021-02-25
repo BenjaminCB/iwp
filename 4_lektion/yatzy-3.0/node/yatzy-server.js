@@ -240,6 +240,12 @@ function processReq(req,res) {
                         .then(roundData => htmlResponse(res,newYatzyRoundPage(roundData)))
                         .catch(err => reportError(res,err));
                         break; 
+                    case "highscores":
+                        extractForm(req)
+                        .then(filter => validateYatzyHighScoreData(filter))
+                        .then(filter => htmlResponse(res, yatzyHighScorePage(filter)))
+                        .catch(err => reportError(res, err));
+                        break;
                     default: 
                         console.error("Resource doesn't exist");
                         errorResponse(res, 404, "No such resource");
@@ -257,8 +263,8 @@ function processReq(req,res) {
                         return htmlResponse(res, yatzyHomePage());
                     case "highscores":
                         try {
-                            let validatedData = validateYatzyHighScoreData(searchParams);
-                            return htmlResponse(res, yatzyHighScorePage(validatedData));
+                            // let validatedData = validateYatzyHighScoreData(searchParams);
+                            return htmlResponse(res, yatzyHighScorePage({filter: "all"}));
                         } catch(err){
                             reportError(res, err);
                         }
