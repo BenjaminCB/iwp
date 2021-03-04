@@ -1,0 +1,5 @@
+{
+    "ales":   ["Bitter","Pale Ale","Brown Ale","Trappist","Porter","Weizenbier"],
+    "lagers": ["Pilsner","Münchener","Wiener","Bock","Porter"],
+    "wilds":  ["Gueuze","Faro","Fruit"]
+}
