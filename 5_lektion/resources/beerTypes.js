@@ -1,17 +1,22 @@
 let beerTypes = {ales: [], lagers: [], wilds: []};
-fetch('/beers.json')
-  .then((response) => {
-    return response.json()
-  })
-  .then((data) => {
-    // Work with JSON data here
+getJSON("/beers.json").then(data => { 
     beerTypes.ales = data.ales;
     beerTypes.lagers = data.lagers;
     beerTypes.wilds = data.wilds;
-  })
-  .catch((err) => {
-    // Do something for an error here
-  })
+});
+// fetch('/beers.json')
+//   .then((response) => {
+//     return response.json()
+//   })
+//   .then((data) => {
+//     // Work with JSON data here
+//     beerTypes.ales = data.ales;
+//     beerTypes.lagers = data.lagers;
+//     beerTypes.wilds = data.wilds;
+//   })
+//   .catch((err) => {
+//     // Do something for an error here
+//   })
 
 let form = document.querySelector("#beerForm");
 let select = makeSelect(beerTypes.ales, "beerSelect");
@@ -49,3 +54,9 @@ function makeNav(names, links) {
     };
     return nav;
 }
+
+async function getJSON(url) {
+    let response = await fetch(url);
+    let body = await response.json();
+    return body;
+};
