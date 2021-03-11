@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>IWP Validation Exercise</title>
+    <meta charset="UTF-8">
+    <script>
+        function monkeysJump(event) {
+            event.preventDefault();
+            let div = document.querySelector("#message"); 
+            let field = document.querySelector("#monkeys");
+            let num = field.value;
+            let msg = "";
+            try {
+                if (isNaN(num)) {
+                    throw new Error("NaN");
+                } else if (num < 1) {
+                    throw new Error("Too small")
+                } else if (num > 5) {
+                    throw new Error("Too big");
+                } else {
+                    msg = Number(num);
+                }
+            }
+            catch(err) {
+                msg = err.message;
+            }
+            finally {
+                div.innerText = msg;
+            }
+        }
+    </script>
+    <script src="static/wait.js"></script>
+</head>
+
+<body>
+    <form id="myForm" >
+        How many little monkeys are jumping on the bed? <input type="text" id="monkeys" value="" >
+        <input type="submit">
+    </form>
+    <div id="message" style="white-space: pre;"/>
+
+    <script>
+        let form = document.getElementById("myForm")
+        form.addEventListener("submit", monkeysJump);
+        form.addEventListener("submit", promiseBased);
+    </script>
+</body> 
+<//html>
