@@ -1,8 +1,8 @@
 "use strict";
 //make use of file system module
-//Note that we use EC6 modules! 
+//Note that we use EC6 modules!
 //You may need to add this to the package.json file when using EC6 modules: "type": "module",
-import fs from 'fs'; 
+import fs from 'fs';
 import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';

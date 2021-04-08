@@ -1,0 +1,12 @@
+{
+  "name": "8_lektion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "chat.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

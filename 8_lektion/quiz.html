@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SSE Quiz</title>
+    </head>
+    <body>
+        <div id="question"></div>
+        <input id="input" style="width:100%; padding:10px; border:solid black 2px"/>
+        <button id="get">Get question</button>
+        <div id="scoreboard"></div>
+        <script>
+            let nick = prompt("Enter your nickname");
+            let input = document.querySelector("#input");
+            let div = document.querySelector("#question");
+            let button = document.querySelector("#get");
+            let answer = {
+                question: "",
+                number: 0,
+                answer: "",
+                nick: nick,
+            };
+
+            input.focus();
+
+            let quiz = new EventSource("/quiz");
+
+            quiz.addEventListener("accepted", e => {
+                console.log(e.data);
+            });
+
+            quiz.addEventListener("question", e => {
+                console.log(e);
+                q = JSON.parse(e.data);
+                answer.number = q.number;
+                answer.question = q.question;
+                div.innerText = question.question;
+            });
+
+            quiz.addEventListener("scoreboard", e => {
+                console.log(e.data);
+            });
+
+            button.addEventListener("click", () => {
+                getJSON("/quiz/question").then(json => {
+                    answer.number = json.number;
+                    answer.question = json.question;
+                    div.innerText = json.question;
+                });
+            });
+
+            input.addEventListener("change", () => {
+                answer.answer = input.value;
+                fetch("/quiz/answer", {
+                    method: "POST",
+                    body: JSON.stringify(answer)
+                })
+                .catch(err => console.log(err));
+                input.value = "";
+            });
+
+            async function getJSON(url) {
+                let response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error("Not okay");
+                }
+
+                let type = response.headers.get("content-type");
+                if (type !== "application/json") {
+                    throw new Error("Not a json file");
+                }
+
+                let body = await response.json();
+                return body;
+            };
+        </script>
+    </body>
+</html>
