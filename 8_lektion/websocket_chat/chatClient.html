@@ -1,0 +1,34 @@
+<html>
+<head><title>SSE Chat</title></head>
+<body>
+<input id="input" style="width:100%; padding:10px; border:solid black 2px"/>
+<script>
+    let nick = prompt("Enter your nickname");
+    let input = document.getElementById("input");
+    input.focus();
+
+    let ws = new WebSocket('ws://127.0.0.1:3000/chat');
+
+    ws.addEventListener("open", () => {
+        console.log("WebSocket open");
+    });
+
+    ws.addEventListener("message", msg => {
+        let data = JSON.parse(msg.data);
+        newMsg(data.utf8Data);
+    });
+
+    input.addEventListener("change", () => {
+        ws.send(nick + ": " + input.value);
+        input.value = "";
+    });
+
+    function newMsg(msg) {
+        let div = document.createElement("div");
+        div.innerText = msg;
+        input.before(div);
+        input.scrollIntoView();
+    }
+</script>
+</body>
+</html>
