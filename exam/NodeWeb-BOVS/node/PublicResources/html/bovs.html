@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>IWP BØVS (Basis Øl Vurderings System) </title>
+    <link rel="stylesheet" type="text/css" href="css/simple.css">
+</head>
+<body>
+
+<section>
+    <h1 id="id1"> IWP BØVS (Basis Øl Vurderings System)</h1>
+    <form id="beerEvalForm_id" action="beerEvaluations" method="post">
+        <fieldset>
+        <legend>Evaluation form:</legend>
+            <div class="myFormLayout">
+                <label for="name_id"> Name</label>
+                <input type="text" name="name" id="name_id" placeholder="Mickey" required minlength="1" maxlength="30">
+
+
+                <label for="dropdown"> Beer</label>
+                <select name="Beer", id="beer">
+                    <option value="tuborg">Tuborg</option>
+                    <option value="thor">Thor</option>
+                    <option value="calsberg">Calsberg</option>
+                </select>
+
+                <label for="score"> Score</label>
+                <input type="number" name="score" id="score" placeholder="1" required min="1" max="10">
+
+                <input type="submit" id="evaluateBtn_id" value="Submit Evaluation">
+            </div>
+        </fieldset>
+    </form>
+
+</section>
+<section>
+    <button type="button" id="refresh">Refresh</button>
+    <table id="highscore">
+    </table>
+</section>
+
+<script  src="js/bovs-client.js"></script>
+</body>
+</html>
